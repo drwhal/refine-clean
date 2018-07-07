@@ -1,0 +1,64 @@
+---
+title: "refine-clean"
+author: "Drew Hall"
+date: "July 7, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+## Data Wrangling
+
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+library(readxl)
+refine_original_csv <- read_excel("C:/Users/Pinea/OneDrive/R/refine_original.csv.xlsx")
+View(refine_original_csv)
+```
+
+```{r}
+the_companies2 <- refine_original_csv
+```
+I had cleaned up the brand names because there was a lot of misspellings and uppercase issues.
+```{r}
+(the_companies2$company<-gsub(".*s", "philips",the_companies2$company))
+(the_companies2$company<-gsub(".*S", "philips",the_companies2$company))
+(the_companies2$company<-gsub(".*r", "unilever",the_companies2$company))
+(the_companies2$company<-gsub("ak.*", "akzo",the_companies2$company))
+(the_companies2$company<-gsub("AK.*", "akzo",the_companies2$company))
+(the_companies2$company<-gsub("A.*", "akzo",the_companies2$company))
+(the_companies2$company<-gsub(".*en", "van houten",the_companies2$company))
+
+```
+I had separated the code and number because it was clunky and it produces another variable to equated. Honeslty it just looks cleaner and it is easier to read. 
+
+```{r}
+(the_companies2 <- separate(the_companies2,'Product code / number', c("Product code", "Product number"), sep = "-"))
+```
+Product catefories were added for clearity of what kind of product they are. This helps with the presentation of the information when plotted. 
+```{r}
+prod<-  c( 'p' = 'Smartphone', 'v' = 'TV', 'x' = 'Laptop', 'q' = 'Tablet')
+the_companies2$product_category <- prod [the_companies2$`Product code`]
+
+```
+
+The address was placed in different cells that made it difficult to search or even read from the data. 
+```{r}
+(the_companies2 <- unite( the_companies2, "full address", address, city, country, sep = " , "))
+```
+I had created a binary code for the companies in the form of a dummy code. 
+```{r}
+the_companies2$company_philips <- ifelse(the_companies2$company == "philips", 1, 0)
+the_companies2$company_akzo <- ifelse(the_companies2$company == "akzo", 1, 0)
+the_companies2$company_van_houten <- ifelse(the_companies2$company == "van houten", 1, 0)
+the_companies2$company_unilever <- ifelse(the_companies2$company == "unilever", 1, 0)
+the_companies2$product_smartphone <- ifelse(the_companies2$product_category == "Smartphone", 1, 0)
+the_companies2$product_tv <- ifelse(the_companies2$product_category == "TV", 1, 0)
+the_companies2$product_laptop <- ifelse(the_companies2$product_category == "Laptop", 1, 0)
+the_companies2$product_tablet <- ifelse(the_companies2$product_category == "Tablet", 1, 0)
+View(the_companies2)
+```
+
